@@ -297,16 +297,9 @@ $(OUT_DIR) :
 	mkdir -p $(OUT_DIR)
 
 # Help
-help :
-	@echo
-	@echo "Latex and Graphviz compilation tool.  Copyright (C) 2009.  Abel Sinkovics (abel@sinkovics.hu)"
-	@echo "This program comes with ABSOLUTELY NO WARRANTY"
-	@echo "This is free software, and you are welcome to redistribute it"
-	@echo "under certain conditions; see http://www.gnu.org/licenses/ for details."
-	@echo
-	@echo "  Usage:"
-	@echo
+help_make : help_header
 	@echo "    make                 - Compiles everything to every format"
+	@echo
 	@echo "    make [file format]   - Compiles everything to specified format"
 	@echo "                           Supported formats: dvi, ps, pdf, svg, svgz, fig,"
 	@echo "                           png, gif, jpg"
@@ -314,10 +307,32 @@ help :
 	@echo "                           . by default."
 	@echo "                           If a file called out_dir exists, it's content"
 	@echo "                           overrides the value of OUT_DIR."
+	@echo
+HELP_TARGETS += help_header
+
+help_clean_tmp : help_header
 	@echo "    make clean_tmp       - Deletes temporary files"
+	@echo
+HELP_TARGETS += help_clean_tmp
+
+help_clean : help_header
 	@echo "    make clean           - Deletes temporary files and targets"
+	@echo
+HELP_TARGETS += help_clean
+
+help_all : help_header
 	@echo "    make all             - Rebuilds everything"
+	@echo
+HELP_TARGETS += help_all
+
+help_help : help_header
 	@echo "    make help            - Display usage"
+	@echo
+	@echo "    make help_[target]   - Display usage of the specified target"
+	@echo
+HELP_TARGETS += help_help
+
+help_show : help_header
 	@echo "    make show            - Compile everything and show them"
 	@echo
 	@echo "                           Program used for displaying can be overwritten:"
@@ -333,32 +348,78 @@ help :
 	@echo "                             $(call showOptionAndDefault, SHOW_CMD)"
 	@echo "                             $(call showOptionAndDefault, SHOW_FORMAT)"
 	@echo
+HELP_TARGETS += help_show
+
+help_slides : help_header
 	@echo "    make slides          - Display a slideshow"
 	@echo "                           Works similarly to \"make show\""
 	@echo "                           The environment variables it uses and their"
 	@echo "                           default values:"
 	@echo "                             $(call showOptionAndDefault, SLIDES_CMD)"
 	@echo "                             $(call showOptionAndDefault, SLIDES_FORMAT)"
+	@echo
+HELP_TARGETS += help_slides
+
+help_options : help_header
 	@echo "    make options         - Display all options"
 	@echo
+HELP_TARGETS += help_options
+
+help_slides_template : help_header
 	@echo "    make slides_template - Create a slides template latex source to start with"
 	@echo "                           The name of the generated template is the"
 	@echo "                           value of the TEMPLATE_NAME option."
+	@echo
+HELP_TARGETS += help_slides_template
+
+help_update : help_header
 	@echo "    update               - Get the latest version of this makefile"
 	@echo "                           Internet connection required."
 	@echo "                           Unless REMOVE_OLD_LATEX_MAKEFILE is defined, it"
 	@echo "                           keeps the old version of this makefile as"
 	@echo "                           Makefile.old"
+	@echo
+HELP_TARGETS += help_update
+
+help_zip : help_header
 	@echo "    zip                  - Cleans the code and creates a zip archive"
 	@echo "                           from it. The name of the zip file depends"
 	@echo "                           on the value of PROJECT_NAME"
+	@echo
+HELP_TARGETS += help_zip
+
+help_project : help_header
 	@echo "    project              - Creates a projectName.txt file in which the"
 	@echo "                           value of the actual PROJECT_NAME is stored."
 	@echo "                           It will be the default value for PROJECT_NAME"
+	@echo
+HELP_TARGETS += help_project
+
+help_backup : help_header
 	@echo "    backup               - Creates a zip archive and uploads it to"
 	@echo "                           a backup server defined by:"
 	@echo "                              FTP_HOST and FTP_USERNAME"
 	@echo "                           Password has to be typed interactively"
+	@echo
+HELP_TARGETS += help_backup
+
+help_todo : help_header
 	@echo "    todo                 - Grep for the TODO text in the source files."
-	@echo ""
+	@echo
+HELP_TARGETS += help_todo
+
+help_header : license
+	@echo "  Usage:"
+	@echo
+
+license :
+	@echo
+	@echo "Latex and Graphviz compilation tool."
+	@echo "Copyright (C) 2009.  Abel Sinkovics (abel@sinkovics.hu)"
+	@echo "This program comes with ABSOLUTELY NO WARRANTY"
+	@echo "This is free software, and you are welcome to redistribute it"
+	@echo "under certain conditions; see http://www.gnu.org/licenses/ for details."
+	@echo
+
+help : $(HELP_TARGETS)
 
