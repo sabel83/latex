@@ -229,9 +229,15 @@ options :
 .PHONY: options
 
 # Update to the latest version of this template
+ifdef REMOVE_OLD_LATEX_MAKEFILE
+  REMOVE_OLD_MAKEFILE = rm Makefile
+else
+  REMOVE_OLD_MAKEFILE = mv Makefile Makefile.old
+endif
+
 update :
 	-rm Makefile.old
-	mv Makefile Makefile.old
+	$(REMOVE_OLD_MAKEFILE)
 	wget http://latex.sinkovics.hu/Makefile
 .PHONY: update
 
@@ -340,6 +346,9 @@ help :
 	@echo "                           value of the TEMPLATE_NAME option."
 	@echo "    update               - Get the latest version of this makefile"
 	@echo "                           Internet connection required."
+	@echo "                           Unless REMOVE_OLD_LATEX_MAKEFILE is defined, it"
+	@echo "                           keeps the old version of this makefile as"
+	@echo "                           Makefile.old"
 	@echo "    zip                  - Cleans the code and creates a zip archive"
 	@echo "                           from it. The name of the zip file depends"
 	@echo "                           on the value of PROJECT_NAME"
