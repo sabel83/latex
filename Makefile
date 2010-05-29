@@ -41,6 +41,8 @@ OPTIONS += OUT_DIR
 
 OPTIONS += SHELL
 
+OPTIONS += REMOVE_OLD_LATEX_MAKEFILE
+
 # The graphviz files
 SRC_DOT_FILES = $(wildcard *.dot)
 SRC_FILES += SRC_DOT_FILES
