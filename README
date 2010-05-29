@@ -1,0 +1,8 @@
+The goal was creating an easy to use (and re-use) tool for writing documentation
+and presentation in Latex. The target operating systems were GNU/Linux based
+systems, however it should work on all Unix based systems. Might work on
+Windows as well.
+
+It makes heavy use of the GNU Make utility: the whole solution consists of a
+Makefile making it easy to deploy and use. 
+

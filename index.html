@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><head>
+  <meta http-equiv="Content-Language" content="en" />
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2" />
+  
+  <link rel="stylesheet" type="text/css" href="http://sinkovics.hu/style.css" />
+
+  <title>Makefile for Latex</title>
+</head><body>
+  <h1>Build environment for Latex</h1>
+  
+  <h2>Introduction</h2>
+  
+  <p>
+    The goal was creating an easy to use (and re-use) tool for writing documentation and presentation in Latex.
+    The target operating systems were GNU/Linux based systems, however it should work on all Unix based systems.
+    Might work on Windows as well.
+  </p>
+  
+  <p>
+    It makes heavy use of the <a href='http://www.gnu.org/software/make/'>GNU Make</a> utility: the whole solution
+    consists of a Makefile making it easy to deploy and use.
+  </p>
+  
+  <h2>Requirements</h2>
+  
+  <p>
+    The following software is required to use this solution:
+  </p>
+  
+  <ul>
+    <li><a href='http://www.gnu.org/software/make/'>GNU Make</a></li>
+    <li><a href='http://www.gnu.org/software/wget/'>GNU wget</a> for updating the solution</li>
+    <li><a href='http://www.info-zip.org/'>Info-Zip</a> for archiving Latex source</li>
+    <li>Latex</li>
+    <li><a href='http://radicaleye.com/dvips.html'>dvips</a></li>
+    <li>dvipdf</li>
+    <li>Command line ftp utility for uploading backups to a server</li>
+    <li>The basic Unix command line utilities</li>
+  </ul>
+  
+  <h2>Usage</h2>
+  
+  <table width='100%' cellspacing='5px' cellpadding='0'>
+  <tr>
+    <td class='code'>make</td>
+    <td>compiles everything to every format</td>
+  </tr>
+  <tr>
+    <td class='code'>make [file format]</td>
+    <td>compiles everything to specified format supported formats: dvi, ps, pdf</td>
+  </tr>
+  <tr>
+    <td class='code'>make clean_tmp</td>
+    <td>deletes temporary files</td>
+  </tr>
+  <tr>
+    <td class='code'>make clean</td>
+    <td>deletes temporary files and targets</td>
+  </tr>
+  <tr>
+    <td class='code'>make all</td>
+    <td>rebuilds everything</td>
+  </tr>
+  <tr>
+    <td class='code'>make help</td>
+    <td>display usage</td>
+  </tr>
+  <tr>
+    <td class='code'>make show</td>
+    <td>
+      compile everything and show them<br />
+      <br />
+      program used for displaying can be overwritten:<br />
+      <a class='code'>&nbsp;&nbsp;SHOW_CMD=&lt;command&gt;</a><br />
+      preferred file format can be overwritten:<br />
+      <a class='code'>&nbsp;&nbsp;SHOW_FORMAT=&lt;format&gt;</a><br />
+      example:<br />
+      <a class='code'>&nbsp;&nbsp;make show SHOW_CMD=kghostview SHOW_FORMAT=pdf</a><br />
+      These values can be overwritten by defining environment variables as well, for example:<br />
+      <a class='code'>&nbsp;&nbsp;export SHOW_CMD=kghostview</a><br />
+      Default values:<br />
+      <a class='code'>&nbsp;&nbsp;SHOW_CMD=acroread</a><br />
+      <a class='code'>&nbsp;&nbsp;SHOW_FORMAT=pdf</a>
+    </td>
+  </tr>
+  <tr>
+    <td class='code'>make slides</td>
+    <td>
+      display a slideshow<br />
+      Works similarly to "make show"<br />
+      The environment variables it uses and their default values:<br />
+      <a class='code'>&nbsp;&nbsp;SLIDES_CMD=xpdf -fullscreen -aa yes -aaVector yes</a><br />
+      <a class='code'>&nbsp;&nbsp;SLIDES_FORMAT=pdf</a>
+    </td>
+  </tr>
+  <tr>
+    <td class='code'>make options</td>
+    <td>display all options</td>
+  </tr>
+  <tr>
+    <td class='code'>make slides_template</td>
+    <td>
+      create a slides template latex source to start with the name of the generated template is the
+      value of the <a class='code'>TEMPLATE_NAME</a> option.
+    </td>
+  </tr>
+  <tr>
+    <td class='code'>update</td>
+    <td>get the latest version of this makefile. Internet connection required.</td>
+  </tr>
+  <tr>
+    <td class='code'>zip</td>
+    <td>
+      cleans the code and creates a zip archive from it.
+      The name of the zip file depends on the value of <a class='code'>PROJECT_NAME</a>.
+    </td>
+  </tr>
+  <tr>
+    <td class='code'>project</td>
+    <td>
+      creates a projectName.txt file in which the value of the actual
+      <a class='code'>PROJECT_NAME</a> is stored. It will be the default value for <a class='code'>PROJECT_NAME</a>
+    </td>
+  </tr>
+  <tr>
+    <td class='code'>backup</td>
+    <td>
+      creates a zip archive and uploads it to a backup server defined by:<br />
+      <a class='code'>&nbsp;&nbsp;FTP_HOST and FTP_USERNAME</a><bt />
+      password has to be typed interactively.
+    </td>
+  </tr>
+  </table>
+  
+  <p>
+    Default values can be overridden by exporting the environment variables with the same name to the
+    <a class='code'>make</a> process or by overriding them explicitly when invoking the <a class='code'>make</a>
+    command:
+  </p>
+  
+  <p class='code'>
+    make NAME=value
+  </p>
+  
+  <h2>Download</h2>
+  
+  <p>
+    <a href='http://sinkovics.hu/latex/Makefile'>Download</a> the latest version.
+  </p>
+</body></html>
