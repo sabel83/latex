@@ -310,29 +310,29 @@ help_make : help_header
 	@echo "                           If a file called out_dir exists, it's content"
 	@echo "                           overrides the value of OUT_DIR."
 	@echo
-HELP_TARGETS += help_header
+HELP_TARGETS += make
 
 help_clean_tmp : help_header
 	@echo "    make clean_tmp       - Deletes temporary files"
 	@echo
-HELP_TARGETS += help_clean_tmp
+HELP_TARGETS += clean_tmp
 
 help_clean : help_header
 	@echo "    make clean           - Deletes temporary files and targets"
 	@echo
-HELP_TARGETS += help_clean
+HELP_TARGETS += clean
 
 help_all : help_header
 	@echo "    make all             - Rebuilds everything"
 	@echo
-HELP_TARGETS += help_all
+HELP_TARGETS += all
 
 help_help : help_header
 	@echo "    make help            - Display usage"
 	@echo
 	@echo "    make help_[target]   - Display usage of the specified target"
 	@echo
-HELP_TARGETS += help_help
+HELP_TARGETS += help
 
 help_show : help_header
 	@echo "    make show            - Compile everything and show them"
@@ -350,7 +350,7 @@ help_show : help_header
 	@echo "                             $(call showOptionAndDefault, SHOW_CMD)"
 	@echo "                             $(call showOptionAndDefault, SHOW_FORMAT)"
 	@echo
-HELP_TARGETS += help_show
+HELP_TARGETS += show
 
 help_slides : help_header
 	@echo "    make slides          - Display a slideshow"
@@ -360,19 +360,19 @@ help_slides : help_header
 	@echo "                             $(call showOptionAndDefault, SLIDES_CMD)"
 	@echo "                             $(call showOptionAndDefault, SLIDES_FORMAT)"
 	@echo
-HELP_TARGETS += help_slides
+HELP_TARGETS += slides
 
 help_options : help_header
 	@echo "    make options         - Display all options"
 	@echo
-HELP_TARGETS += help_options
+HELP_TARGETS += options
 
 help_slides_template : help_header
 	@echo "    make slides_template - Create a slides template latex source to start with"
 	@echo "                           The name of the generated template is the"
 	@echo "                           value of the TEMPLATE_NAME option."
 	@echo
-HELP_TARGETS += help_slides_template
+HELP_TARGETS += slides_template
 
 help_update : help_header
 	@echo "    update               - Get the latest version of this makefile"
@@ -381,21 +381,21 @@ help_update : help_header
 	@echo "                           keeps the old version of this makefile as"
 	@echo "                           Makefile.old"
 	@echo
-HELP_TARGETS += help_update
+HELP_TARGETS += update
 
 help_zip : help_header
 	@echo "    zip                  - Cleans the code and creates a zip archive"
 	@echo "                           from it. The name of the zip file depends"
 	@echo "                           on the value of PROJECT_NAME"
 	@echo
-HELP_TARGETS += help_zip
+HELP_TARGETS += zip
 
 help_project : help_header
 	@echo "    project              - Creates a projectName.txt file in which the"
 	@echo "                           value of the actual PROJECT_NAME is stored."
 	@echo "                           It will be the default value for PROJECT_NAME"
 	@echo
-HELP_TARGETS += help_project
+HELP_TARGETS += project
 
 help_backup : help_header
 	@echo "    backup               - Creates a zip archive and uploads it to"
@@ -403,12 +403,17 @@ help_backup : help_header
 	@echo "                              FTP_HOST and FTP_USERNAME"
 	@echo "                           Password has to be typed interactively"
 	@echo
-HELP_TARGETS += help_backup
+HELP_TARGETS += backup
 
 help_todo : help_header
 	@echo "    todo                 - Grep for the TODO text in the source files."
 	@echo
-HELP_TARGETS += help_todo
+HELP_TARGETS += todo
+
+help_targets : help_header
+	@echo "    targets              - List accepted make targets"
+	@echo
+HELP_TARGETS += targets
 
 help_header : license
 	@echo "  Usage:"
@@ -423,5 +428,10 @@ license :
 	@echo "under certain conditions; see http://www.gnu.org/licenses/ for details."
 	@echo
 
-help : $(HELP_TARGETS)
+help : help_header $(addprefix help_, $(HELP_TARGETS))
+
+targets : help_header
+	@echo " $(foreach t, $(sort $(HELP_TARGETS)),   $(t)\n)"
+
+
 
