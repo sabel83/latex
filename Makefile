@@ -43,6 +43,7 @@ OPTIONS += SHELL
 
 # The graphviz files
 SRC_DOT_FILES = $(wildcard *.dot)
+SRC_FILES += SRC_DOT_FILES
 
 DOT_PS_FILES = $(addprefix $(OUT_DIR)/,$(SRC_DOT_FILES:.dot=.ps))
 OUT_PS_FILES += $(DOT_PS_FILES)
@@ -70,6 +71,7 @@ OUT_JPG_FILES += $(DOT_JPG_FILES)
 
 # The latex files
 SRC_TEX_FILES = $(wildcard *.tex)
+SRC_FILES += SRC_TEX_FILES
 
 TEX_DVI_FILES = $(addprefix $(OUT_DIR)/,$(SRC_TEX_FILES:.tex=.dvi))
 OUT_DVI_FILES += $(TEX_DVI_FILES)
@@ -233,6 +235,11 @@ update :
 	wget http://latex.sinkovics.hu/Makefile
 .PHONY: update
 
+# Grep all TODOs in the source files
+todo :
+	@grep TODO $(SRC_TEX_FILES)
+.PHONY: todo
+
 # Create an archive
 zip : $(ZIP_ARCHIVE)
 .PHONY : zip
@@ -343,4 +350,6 @@ help :
 	@echo "                           a backup server defined by:"
 	@echo "                              FTP_HOST and FTP_USERNAME"
 	@echo "                           Password has to be typed interactively"
+	@echo "    todo                 - Grep for the TODO text in the source files."
+	@echo ""
 
