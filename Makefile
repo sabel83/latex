@@ -245,7 +245,7 @@ update :
 
 # Grep all TODOs in the source files
 todo :
-	@grep TODO $(SRC_TEX_FILES)
+	@grep TODO $(SRC_TEX_FILES) || true
 .PHONY: todo
 
 # Create an archive
