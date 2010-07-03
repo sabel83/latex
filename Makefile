@@ -117,7 +117,7 @@ TARGET_FILES += $(OUT_GIF_FILES)
 TARGET_FILES += $(OUT_JPG_FILES)
 
 # Files that are archived when an archive is created
-FILES_TO_ARCHIVE = $(shell ls $(OUT_DIR)/* | egrep -v '[.]zip$$' $(foreach f,$(TEMP_FILES) $(TARGET_FILES), | grep -vF $(f)))
+FILES_TO_ARCHIVE = $(addprefix $(OUT_DIR)/,$(shell ls $(OUT_DIR) | egrep -v '[.]zip$$' $(foreach f,$(patsubst $(OUTDIR)/%,,$(TEMP_FILES) $(TARGET_FILES)), | grep -vF $(f))))
 
 # Default options
 DEFAULT_SLIDES_CMD = xpdf -fullscreen -aa yes -aaVector yes
