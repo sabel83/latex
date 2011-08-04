@@ -1,5 +1,5 @@
 # Latex and graphviz compilation tool
-# Copyright (C) 2009-2010. Abel Sinkovics (abel@sinkovics.hu)
+# Copyright (C) 2009-2011. Abel Sinkovics (abel@sinkovics.hu)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -101,6 +101,12 @@ TEMP_FILES += $(TMP_TOC_FILES)
 TMP_VRB_FILES = $(SRC_TEX_FILES:.tex=.vrb)
 TEMP_FILES += $(TMP_VRB_FILES)
 
+# Bibliography dependencies
+BIB_DEPS_FILE = bib.mk
+TEMP_FILES += $(BIB_DEPS_FILE)
+$(shell echo "" > $(BIB_DEPS_FILE))
+$(foreach t, $(SRC_TEX_FILES), $(shell egrep '\\bibliography\{[^}]*\}' $(t) | sed 's/\\bibliography{\|}//g' | awk '{printf("$(t) : %s.bib\nTEMP_FILES += $(OUT_DIR)/$(basename $(t)).blg $(OUT_DIR)/$(basename $(t)).bbl\n", $$0); }' >> $(BIB_DEPS_FILE)) )
+
 # Join same file types coming from different source formats
 OUT_PS_FILES += $(DVI_PS_FILES)
 OUT_PDF_FILES += $(DVI_PDF_FILES) $(PS_PDF_FILES)
@@ -185,7 +191,9 @@ $(DOT_JPG_FILES) : $(OUT_DIR)/%.jpg : %.dot
 	dot -Tjpg $< -o $@
 
 $(TEX_DVI_FILES) : $(OUT_DIR)/%.dvi : %.tex $(OUT_DIR) $(LATEX_DEPENDENCIES)
-	latex -output-directory $(OUT_DIR) $< && latex -output-directory $(OUT_DIR) $<
+	latex -output-directory $(OUT_DIR) $<
+	if egrep '\\bibliography\{[^}]*\}' $<; then bibtex $(OUT_DIR)/$(basename $<).aux && latex -output-directory $(OUT_DIR) $<; else echo "no bibliography found"; fi
+	latex -output-directory $(OUT_DIR) $<
 
 # Convert dvi files to ps files
 $(DVI_PS_FILES) : %.ps : %.dvi
@@ -217,12 +225,12 @@ all : clean all_latex
 .PHONY: all
 
 # Show
-show : $(SRC_TEX_FILES:.tex=.$(SHOW_FORMAT))
+show : $(addprefix $(OUT_DIR)/, $(SRC_TEX_FILES:.tex=.$(SHOW_FORMAT)))
 	$(foreach f,$+, $(SHOW_CMD) $(f) && ) true
 .PHONY: show
 
 # Display slideshow
-slides : $(SRC_TEX_FILES:.tex=.$(SLIDES_FORMAT))
+slides : $(addprefix $(OUT_DIR)/, $(SRC_TEX_FILES:.tex=.$(SLIDES_FORMAT)))
 	$(foreach f,$+, $(SLIDES_CMD) $(f) && ) true
 
 # Display options
@@ -242,6 +250,8 @@ update :
 	$(REMOVE_OLD_MAKEFILE)
 	wget http://latex.sinkovics.hu/Makefile
 .PHONY: update
+
+include $(BIB_DEPS_FILE)
 
 # Grep all TODOs in the source files
 todo :
