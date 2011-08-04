@@ -14,13 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+-include config.mk
+
 # The shell to use
 SHELL ?= /bin/bash
 
 # The output directory to use
-OUT_DIR ?= .
 ifeq ($(wildcard out_dir),out_dir)
-	OUT_DIR := $(shell cat out_dir)
+  OUT_DIR ?= $(shell cat out_dir)
+else
+  OUT_DIR ?= .
 endif
 
 # List of options
@@ -105,7 +108,7 @@ TEMP_FILES += $(TMP_VRB_FILES)
 BIB_DEPS_FILE = bib.mk
 TEMP_FILES += $(BIB_DEPS_FILE)
 $(shell echo "" > $(BIB_DEPS_FILE))
-$(foreach t, $(SRC_TEX_FILES), $(shell egrep '\\bibliography\{[^}]*\}' $(t) | sed 's/\\bibliography{\|}//g' | awk '{printf("$(t) : %s.bib\nTEMP_FILES += $(OUT_DIR)/$(basename $(t)).blg $(OUT_DIR)/$(basename $(t)).bbl\n", $$0); }' >> $(BIB_DEPS_FILE)) )
+$(foreach t, $(SRC_TEX_FILES), $(shell egrep '\\bibliography\{[^}]*\}' $(t) | sed 's/^.*\\bibliography{\|}.*//g' | awk '{printf("$(t) : %s.bib\nTEMP_FILES += $(OUT_DIR)/$(basename $(t)).blg $(OUT_DIR)/$(basename $(t)).bbl\n", $$0); }' >> $(BIB_DEPS_FILE)) )
 
 # Join same file types coming from different source formats
 OUT_PS_FILES += $(DVI_PS_FILES)
@@ -308,6 +311,13 @@ slides_template :
 $(OUT_DIR) :
 	mkdir -p $(OUT_DIR)
 
+# Create config makefile
+config : config.mk
+config.mk :
+	echo 'PROJECT_NAME ?= $(PROJECT_NAME)' > $@
+	echo 'OUT_DIR ?= $(OUT_DIR)' >> $@
+.PHONY : config.mk
+
 # Help
 help_make : help_header
 	@echo "    make                 - Compiles everything to every format"
@@ -400,13 +410,6 @@ help_zip : help_header
 	@echo
 HELP_TARGETS += zip
 
-help_project : help_header
-	@echo "    project              - Creates a projectName.txt file in which the"
-	@echo "                           value of the actual PROJECT_NAME is stored."
-	@echo "                           It will be the default value for PROJECT_NAME"
-	@echo
-HELP_TARGETS += project
-
 help_backup : help_header
 	@echo "    backup               - Creates a zip archive and uploads it to"
 	@echo "                           a backup server defined by:"
@@ -419,6 +422,17 @@ help_todo : help_header
 	@echo "    todo                 - Grep for the TODO text in the source files."
 	@echo
 HELP_TARGETS += todo
+
+help_config : help_header
+	@echo "    config               - Generate the config.mk file containing the"
+	@echo "                           project-specific options."
+	@echo "                           It stores the following options:"
+	@echo "                             PROJECT_NAME - used for archive generation"
+	@echo "                             OUT_DIR      - directory to generate output"
+	@echo "                                            files into"
+	@echo "                           Changing these options:"
+	@echo "                             make config PROJECT_NAME=<new name>"
+HELP_TARGETS += config
 
 help_targets : help_header
 	@echo "    targets              - List accepted make targets"
