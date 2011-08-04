@@ -20,11 +20,7 @@
 SHELL ?= /bin/bash
 
 # The output directory to use
-ifeq ($(wildcard out_dir),out_dir)
-  OUT_DIR ?= $(shell cat out_dir)
-else
-  OUT_DIR ?= .
-endif
+OUT_DIR ?= .
 
 # List of options
 OPTIONS += SHOW_CMD
