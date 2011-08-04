@@ -38,6 +38,8 @@ OPTIONS += FTP_USERNAME
 
 OPTIONS += OUT_DIR
 
+OPTIONS += USE_PDFLATEX
+
 OPTIONS += SHELL
 
 OPTIONS += REMOVE_OLD_LATEX_MAKEFILE
@@ -74,10 +76,15 @@ OUT_JPG_FILES += $(DOT_JPG_FILES)
 SRC_TEX_FILES = $(wildcard *.tex)
 SRC_FILES += SRC_TEX_FILES
 
-TEX_DVI_FILES = $(addprefix $(OUT_DIR)/,$(SRC_TEX_FILES:.tex=.dvi))
-OUT_DVI_FILES += $(TEX_DVI_FILES)
-DVI_PS_FILES += $(TEX_DVI_FILES:.dvi=.ps)
-DVI_PDF_FILES += $(TEX_DVI_FILES:.dvi=.pdf)
+ifeq ($(USE_PDFLATEX),)
+  TEX_DVI_FILES = $(addprefix $(OUT_DIR)/,$(SRC_TEX_FILES:.tex=.dvi))
+  OUT_DVI_FILES += $(TEX_DVI_FILES)
+  DVI_PS_FILES += $(TEX_DVI_FILES:.dvi=.ps)
+  DVI_PDF_FILES += $(TEX_DVI_FILES:.dvi=.pdf)
+else
+  TEX_PDF_FILES = $(addprefix $(OUT_DIR)/,$(SRC_TEX_FILES:.tex=.pdf))
+  PDF_PS_FILES += $(TEX_PDF_FILES:.pdf=.ps)
+endif
 
 TMP_LOG_FILES = $(addprefix $(OUT_DIR)/,$(SRC_TEX_FILES:.tex=.log))
 TEMP_FILES += $(TMP_LOG_FILES)
@@ -107,8 +114,8 @@ $(shell echo "" > $(BIB_DEPS_FILE))
 $(foreach t, $(SRC_TEX_FILES), $(shell egrep '\\bibliography\{[^}]*\}' $(t) | sed 's/^.*\\bibliography{\|}.*//g' | awk '{printf("$(t) : %s.bib\nTEMP_FILES += $(OUT_DIR)/$(basename $(t)).blg $(OUT_DIR)/$(basename $(t)).bbl\n", $$0); }' >> $(BIB_DEPS_FILE)) )
 
 # Join same file types coming from different source formats
-OUT_PS_FILES += $(DVI_PS_FILES)
-OUT_PDF_FILES += $(DVI_PDF_FILES) $(PS_PDF_FILES)
+OUT_PS_FILES += $(DVI_PS_FILES) $(PDF_PS_FILES)
+OUT_PDF_FILES += $(DVI_PDF_FILES) $(PS_PDF_FILES) $(TEX_PDF_FILES)
 
 # Files that are real targets
 TARGET_FILES += $(OUT_DVI_FILES)
@@ -194,6 +201,11 @@ $(TEX_DVI_FILES) : $(OUT_DIR)/%.dvi : %.tex $(OUT_DIR) $(LATEX_DEPENDENCIES)
 	if egrep '\\bibliography\{[^}]*\}' $<; then bibtex $(OUT_DIR)/$(basename $<).aux && latex -output-directory $(OUT_DIR) $<; else echo "no bibliography found"; fi
 	latex -output-directory $(OUT_DIR) $<
 
+$(TEX_PDF_FILES) : $(OUT_DIR)/%.pdf : %.tex $(OUT_DIR) $(LATEX_DEPENDENCIES)
+	pdflatex -output-directory $(OUT_DIR) $<
+	if egrep '\\bibliography\{[^}]*\}' $<; then bibtex $(OUT_DIR)/$(basename $<).aux && pdflatex -output-directory $(OUT_DIR) $<; else echo "no bibliography found"; fi
+	pdflatex -output-directory $(OUT_DIR) $<
+
 # Convert dvi files to ps files
 $(DVI_PS_FILES) : %.ps : %.dvi
 	dvips -o $@ $<
@@ -205,6 +217,10 @@ $(DVI_PDF_FILES) : %.pdf : %.dvi
 # Convert ps files to pdf files
 $(PS_PDF_FILES) : %.pdf : %.ps
 	ps2pdf $< $@
+
+# Convert pdf files to ps files
+$(PDF_PS_FILES) : %.ps : %.pdf
+	pdf2ps $< $@
 
 # Remove temporary files
 clean_tmp :
@@ -308,11 +324,11 @@ $(OUT_DIR) :
 	mkdir -p $(OUT_DIR)
 
 # Create config makefile
-config : config.mk
-config.mk :
-	echo 'PROJECT_NAME ?= $(PROJECT_NAME)' > $@
-	echo 'OUT_DIR ?= $(OUT_DIR)' >> $@
-.PHONY : config.mk
+config :
+	echo 'PROJECT_NAME ?= $(PROJECT_NAME)' > config.mk
+	echo 'OUT_DIR ?= $(OUT_DIR)' >> config.mk
+	echo 'USE_PDFLATEX ?= $(USE_PDFLATEX)' >> config.mk
+.PHONY: config
 
 # Help
 help_make : help_header
@@ -426,6 +442,7 @@ help_config : help_header
 	@echo "                             PROJECT_NAME - used for archive generation"
 	@echo "                             OUT_DIR      - directory to generate output"
 	@echo "                                            files into"
+	@echo "                             USE_PDFLATEX - use pdflatex instead of latex"
 	@echo "                           Changing these options:"
 	@echo "                             make config PROJECT_NAME=<new name>"
 HELP_TARGETS += config
